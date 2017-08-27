@@ -1,0 +1,29 @@
+{
+  "location": "Coburg",
+  "gold": 997,
+  "bankedGold": 4000,
+  "miniMedals": 1,
+  "players": {
+    "hero": {
+      "items": {
+        "Medicinal herb": 1,
+        "Rags": 1
+      }
+    },
+    "parry": {
+      "items": {}
+    },
+    "madchen": {
+      "items": {
+        "Bronze shield": 1
+      }
+    },
+    "sancho": {
+      "items": {}
+    }
+  },
+  "etc": {
+    "fortunaPrisonerGone": true,
+    "fortunaPrisonerGotMiniMedal": true
+  }
+}
