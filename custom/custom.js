@@ -7,6 +7,10 @@ module.exports = class CustomGameClass extends Game {
     super({
       players: {
         hero: new (require('./characters/Hero'))
+      },
+
+      defaultSave: {
+        location: 'DustyRoom'
       }
     })
   }

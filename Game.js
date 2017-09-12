@@ -12,11 +12,16 @@ const Location = require('./Location')
 module.exports = class Game {
   constructor({
     // List of playable characters.
-    players = {}
+    players = {},
+
+    // Default save object, from which data is loaded if a loaded save file
+    // is missing or incomplete.
+    defaultSave = {}
   } = {}) {
     this.locations = {}
     this.items = {}
     this.players = players
+    this.defaultSave = defaultSave
 
     this.currentLocation = null
     this.partyChatScenes = []
@@ -62,33 +67,59 @@ module.exports = class Game {
     })
   }
 
+  load(...args) {
+    return this.loadFromFile(...args)
+  }
+
   // Load, asynchronously. Loads from .savefile.json by default.
-  load(file = '.savefile.json') {
+  loadFromFile(file = '.savefile.json') {
     return new Promise((resolve, reject) => {
       fs.readFile(file, (err, text) => {
         if (err) {
-          reject(err)
+          if (err.code === 'ENOENT') {
+            this.loadFromObject(this.defaultSave)
+          } else {
+            reject(err)
+          }
+
           return
         }
 
         const loadString = text.toString()
         const loadObj = JSON.parse(text)
-
-        this.gold = loadObj.gold || 0
-        this.bankedGold = loadObj.bankedGold || 0
-        this.miniMedals = loadObj.miniMedals || 0
-        this.saveEtc = loadObj.etc || {}
-
-        const loadPlayers = loadObj.players || {}
-        for (let playerKey in this.players) {
-          this.players[playerKey].load(loadPlayers[playerKey] || {})
-        }
-
-        this.goTo(loadObj.location || 'Fortuna/Inn')
+        this.loadFromObject(loadObj)
 
         resolve()
       })
     })
+  }
+
+  loadFromObject(loadObj) {
+    this.gold = loadObj.gold || this.defaultSave.gold || 0
+    this.bankedGold = loadObj.bankedGold || this.defaultSave.bankedGold || 0
+
+    // TODO: Mini medals are game-specific. They should probably be stored on
+    // saveEtc.
+    this.miniMedals = loadObj.miniMedals || this.defaultSave.miniMedals || 0
+
+    this.saveEtc = Object.assign({}, this.defaultSave.etc || {}, loadObj.etc)
+
+    const loadPlayers = loadObj.players || {}
+    for (let playerKey in this.players) {
+      this.players[playerKey].load(loadPlayers[playerKey] || {})
+    }
+
+    const location = loadObj.location || this.defaultSave.location || null
+    if (location) {
+      this.goTo(location)
+    } else {
+      // TODO: This should really be an error thrown as soon as Game is
+      // constructed.
+      console.error(
+        'The loaded save doesn\'t have a location, and this game has no ' +
+        'default location.'
+      )
+    }
   }
 
   // Go to a location. Use the location's module name.
