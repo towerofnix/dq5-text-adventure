@@ -6,10 +6,7 @@ module.exports = class CustomGameClass extends Game {
   constructor() {
     super({
       players: {
-        hero: new (require('./characters/Hero')),
-        parry: new (require('./characters/Parry')),
-        madchen: new (require('./characters/Madchen')),
-        sancho: new (require('./characters/Sancho'))
+        hero: new (require('./characters/Hero'))
       }
     })
   }

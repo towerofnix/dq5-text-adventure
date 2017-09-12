@@ -5,11 +5,11 @@ const PlayerCharacter = require('../../PlayerCharacter')
 module.exports = class Hero extends PlayerCharacter {
   constructor() {
     super({
-      name: 'Anonym'
+      name: 'Saith'
     })
   }
 
-  talkedTo() {
+  talkedto() {
     this.say('..?')
   }
 }
